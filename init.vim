@@ -16,6 +16,8 @@ call plug#begin('~/.config/nvim/autoload/plugged')
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
     " Fuzzy Files
     Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+    Plug 'junegunn/fzf.vim'
+    Plug 'benwainwright/fzf-project'
     " Devicons
     Plug 'ryanoasis/vim-devicons'
     " GitGutter
@@ -29,7 +31,6 @@ call plug#begin('~/.config/nvim/autoload/plugged')
     " Surround
     Plug 'tpope/vim-surround'
     " Ranger
-    " Plug 'francoiscabrol/ranger.vim'
     Plug 'rbgrouleff/bclose.vim'
     " Commentary
     Plug 'tpope/vim-commentary'
@@ -46,8 +47,8 @@ call plug#begin('~/.config/nvim/autoload/plugged')
     Plug 'vim-airline/vim-airline-themes'
     " venv-vim
     Plug 'jmcantrell/vim-virtualenv'    
-    " vimpyter
-    Plug 'szymonmaszke/vimpyter' 
+    " prettier
+    Plug 'prettier/vim-prettier', { 'do': 'yarn install' }    
 
 call plug#end()
 
@@ -55,19 +56,33 @@ colorscheme gruvbox
 
 tnoremap <Esc> <C-\><C-n>
 
+" FZF Switch Proj
+let g:fzfSwitchProjectGitInitBehavior = 'ask' " default
+let g:fzfSwitchProjectFindFilesCommand = 'git ls-files --others --exclude-standard --cached'
+
+" Open terminal with Ctrl-t
+au BufEnter * if &buftype == 'terminal' | :startinsert | endif
+function! OpenTerminal()
+  split term://bash
+  resize 10
+endfunction
+nnoremap <c-t> :call OpenTerminal()<CR>
+
+" FZF options
 let g:ranger_command_override = 'ranger --cmd "set show_hidden=true"'
-nmap <C-f> :FZF <CR>
+nmap <C-p> :FZF <CR>
 nmap <C-n> :RangerOpenCurrentDir <CR>
+" Tags with leader 
+nnoremap <Leader>t :BTags<CR>
+nnoremap <Leader>T :Tags<CR>
 
 " Map Caps Lock to Escape
 au VimEnter * !xmodmap -e 'clear Lock' -e 'keycode 0x42 = Escape'
 au VimLeave * !xmodmap -e 'clear Lock' -e 'keycode 0x42 = Caps_Lock'
 
-" Vimpyter Options
-autocmd Filetype ipynb nmap <silent><Leader>b :VimpyterInsertPythonBlock<CR>
-autocmd Filetype ipynb nmap <silent><Leader>j :VimpyterStartJupyter<CR>
-autocmd Filetype ipynb nmap <silent><Leader>n :VimpyterStartNteract<CR>
 
+set splitright
+set splitbelow
 set relativenumber
 set autochdir
 set smarttab
