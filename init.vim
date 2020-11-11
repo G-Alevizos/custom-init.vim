@@ -12,7 +12,7 @@ call plug#begin('~/.config/nvim/autoload/plugged')
     Plug 'sheerun/vim-polyglot'
     " Auto pairs for '(' '[' '{'
     Plug 'jiangmiao/auto-pairs'
-    " CoC Plugin
+    " CoC Plug
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
     " Fuzzy Files
     Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -38,7 +38,7 @@ call plug#begin('~/.config/nvim/autoload/plugged')
     " pep8 indent
     Plug 'Vimjas/vim-python-pep8-indent'
     " ranger pt2
-    Plug 'iberianpig/ranger-explorer.vim'
+    " Plug 'iberianpig/ranger-explorer.vim'
     " hydrogen
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-line'
@@ -58,16 +58,110 @@ call plug#begin('~/.config/nvim/autoload/plugged')
     Plug 'jeetsukumaran/vim-pythonsense'
     " Targets
     Plug 'wellle/targets.vim'
+    " C++ support
+    Plug 'rhysd/vim-clang-format'
+    " Which-Key
+    Plug 'liuchengxu/vim-which-key'    
+    " Swoop
+    Plug 'pelodelfuego/vim-swoop'
+    " NERDTREE
+    if has('nvim')
+      Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
+    Plug 'kristijanhusak/defx-git'
+    Plug 'kristijanhusak/defx-icons'
 
 call plug#end()
 
 colorscheme gruvbox
-
+set guifont=DroidSansMono\ Nerd\ Font\ 11
 tnoremap <Esc> <C-\><C-n>
+let g:airline_powerline_fonts = 1
+
+" Nerdtree options
+nmap <C-n> : <C-U>:Defx -resume -buffer_name=explorer -split=vertical -winwidth=40 -direction=topleft -columns=git:indent:icons:indent:filename:type<CR>
+    
+autocmd FileType defx call s:defx_my_settings()
+	function! s:defx_my_settings() abort
+	  " Define mappings
+	  nnoremap <silent><buffer><expr> <CR>
+      \ defx#do_action('open_tree', 'toggle') 
+	  nnoremap <silent><buffer><expr> c
+	  \ defx#do_action('copy')
+	  nnoremap <silent><buffer><expr> m
+	  \ defx#do_action('move')
+	  nnoremap <silent><buffer><expr> p
+	  \ defx#do_action('paste')
+	  nnoremap <silent><buffer><expr> l
+      \ defx#do_action('open') 
+	  nnoremap <silent><buffer><expr> <C-v>
+	  \ defx#do_action('open', 'vsplit')
+	  nnoremap <silent><buffer><expr> P
+	  \ defx#do_action('preview')
+	  nnoremap <silent><buffer><expr> o
+	  \ defx#do_action('open_tree', 'toggle')
+	  nnoremap <silent><buffer><expr> K
+	  \ defx#do_action('new_directory')
+	  nnoremap <silent><buffer><expr> N
+	  \ defx#do_action('new_file')
+	  nnoremap <silent><buffer><expr> M
+	  \ defx#do_action('new_multiple_files')
+	  nnoremap <silent><buffer><expr> C
+	  \ defx#do_action('toggle_columns',
+	  \                'mark:indent:icon:filename:type:size:time')
+	  nnoremap <silent><buffer><expr> S
+	  \ defx#do_action('toggle_sort', 'time')
+	  nnoremap <silent><buffer><expr> d
+	  \ defx#do_action('remove')
+	  nnoremap <silent><buffer><expr> r
+	  \ defx#do_action('rename')
+	  nnoremap <silent><buffer><expr> !
+	  \ defx#do_action('execute_command')
+	  nnoremap <silent><buffer><expr> x
+	  \ defx#do_action('execute_system')
+	  nnoremap <silent><buffer><expr> yy
+	  \ defx#do_action('yank_path')
+	  nnoremap <silent><buffer><expr> .
+	  \ defx#do_action('toggle_ignored_files')
+	  nnoremap <silent><buffer><expr> ;
+	  \ defx#do_action('repeat')
+	  nnoremap <silent><buffer><expr> h
+	  \ defx#do_action('cd', ['..'])
+	  nnoremap <silent><buffer><expr> ~
+	  \ defx#do_action('cd')
+	  nnoremap <silent><buffer><expr> q
+	  \ defx#do_action('quit')
+	  nnoremap <silent><buffer><expr> <Space>
+	  \ defx#do_action('toggle_select') . 'j'
+	  nnoremap <silent><buffer><expr> *
+	  \ defx#do_action('toggle_select_all')
+	  nnoremap <silent><buffer><expr> j
+	  \ line('.') == line('$') ? 'gg' : 'j'
+	  nnoremap <silent><buffer><expr> k
+	  \ line('.') == 1 ? 'G' : 'k'
+	  nnoremap <silent><buffer><expr> <C-g>
+	  \ defx#do_action('print')
+	  nnoremap <silent><buffer><expr> cd
+	  \ defx#do_action('change_vim_cwd')
+	endfunction
+
+call defx#custom#column('git', 'indicators', {
+  \ 'Modified'  : '✹',
+  \ 'Staged'    : '✚',
+  \ 'Untracked' : '✭',
+  \ 'Renamed'   : '➜',
+  \ 'Unmerged'  : '═',
+  \ 'Ignored'   : '☒',
+  \ 'Deleted'   : '✖',
+  \ 'Unknown'   : '?'
+  \ })
+
+" Map \f to formating using clang
+nnoremap <Leader>f :<C-u>ClangFormat<CR>
 
 " FZF Switch Proj
 let g:fzfSwitchProjectGitInitBehavior = 'ask' " default
 let g:fzfSwitchProjectFindFilesCommand = 'git ls-files --others --exclude-standard --cached'
+let g:fzf_preview_window = ['right:50%', 'ctrl-/']
 
 " Open terminal with Ctrl-t
 au BufEnter * if &buftype == 'terminal' | :startinsert | endif
@@ -78,9 +172,7 @@ endfunction
 nnoremap <c-t> :call OpenTerminal()<CR>
 
 " FZF options
-let g:ranger_command_override = 'ranger --cmd "set show_hidden=true"'
 nmap <C-p> :FZF <CR>
-nmap <C-n> :RangerOpenCurrentDir <CR>
 " Tags with leader 
 nnoremap <Leader>t :BTags<CR>
 nnoremap <Leader>T :Tags<CR>
@@ -127,8 +219,8 @@ set relativenumber
 set autochdir
 set smarttab
 set cindent
-set tabstop=2
-set shiftwidth=2
+set tabstop=4
+set shiftwidth=4
 " always uses spaces instead of tab characters
 set expandtab
 
@@ -286,7 +378,7 @@ nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
 " Show commands.
 nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
 " Find symbol of current document.
-nnoremap <silent><nowait> <space>o  :<C-u>CocList outline<cr>
+" nnoremap <silent><nowait> <space>o  :<C-u>CocList outline<cr>
 " Search workspace symbols.
 nnoremap <silent><nowait> <space>s  :<C-u>CocList -I symbols<cr>
 " Do default action for next item.
@@ -295,3 +387,56 @@ nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>e
+
+" -----------------------------------------------------------------VIM WHICH KEY CONFIG----------------------------------------------------------------------------------
+let g:mapleader = "\<Space>"
+let g:maplocalleader = ','
+
+set timeoutlen=500
+
+call which_key#register('<Space>', "g:which_key_map")
+nnoremap <silent> <leader> :<c-u>WhichKey '<Space>'<CR>
+vnoremap <silent> <leader> :<c-u>WhichKeyVisual '<Space>'<CR>et timeoutlen=50
+
+" Define prefix dictionary
+let g:which_key_map =  {}
+
+let g:which_key_map.f = { 'name' : '+file' }
+
+nnoremap <silent> <leader>fs :update<CR>
+let g:which_key_map.f.s = 'save-file'
+
+nnoremap <silent> <leader>fd :e $MYVIMRC<CR>
+let g:which_key_map.f.d = 'open-vimrc'
+
+nnoremap <silent> <leader>oq  :copen<CR>
+nnoremap <silent> <leader>ol  :lopen<CR>
+let g:which_key_map.o = {
+      \ 'name' : '+open',
+      \ 'q' : 'open-quickfix'    ,
+      \ 'l' : 'open-locationlist',
+      \ }
+
+" =======================================================
+" Create menus not based on existing mappings:
+" =======================================================
+" Provide commands(ex-command, <Plug>/<C-W>/<C-d> mapping, etc.)
+" and descriptions for the existing mappings.
+"
+" Note:
+" Some complicated ex-cmd may not work as expected since they'll be
+" feed into `feedkeys()`, in which case you have to define a decicated
+" Command or function wrapper to make it work with vim-which-key.
+" Ref issue #126, #133 etc.
+let g:which_key_map.b = {
+      \ 'name' : '+buffer' ,
+      \ '1' : ['b1'        , 'buffer 1']        ,
+      \ '2' : ['b2'        , 'buffer 2']        ,
+      \ 'd' : ['bd'        , 'delete-buffer']   ,
+      \ 'f' : ['bfirst'    , 'first-buffer']    ,
+      \ 'h' : ['Startify'  , 'home-buffer']     ,
+      \ 'l' : ['blast'     , 'last-buffer']     ,
+      \ 'n' : ['bnext'     , 'next-buffer']     ,
+      \ 'p' : ['bprevious' , 'previous-buffer'] ,
+      \ '?' : ['Buffers'   , 'fzf-buffer']      ,
+      \ }
